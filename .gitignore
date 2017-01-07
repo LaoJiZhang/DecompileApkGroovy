@@ -10,3 +10,6 @@ gradle/
 gradlew*
 LICENSE
 local.properties
+apk/
+apk/outDir
+apk/*.apk
