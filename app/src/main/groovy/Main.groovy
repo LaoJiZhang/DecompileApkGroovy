@@ -11,8 +11,8 @@ class Main {
 
     static String ORIGIN_FILE_PATH = "apk/"
     static String URL_FORMAT = "http://apis.wandoujia.com/five/v2/apps/tops/weeklytopapp?v=5.17.1&deviceId=ODY2NjU0MDI3MjYwNDAy&sdk=22&id=wandoujia_android&launchedCount=7&udid=9858a9f26eaa4c78bf7160f552f72a9e196b81fd&channel=wandoujia_pc_wandoujia2_homepage&rippleSupported=false&vc=12029&capacity=3&launchedAge=0&start=%d&max=%d"
-    static int START_NUMBER = 10
-    static int END_NUMBER = 10
+    static int START_NUMBER = 60
+    static int END_NUMBER = 4
 
     static int successfulCount = 0
     static ExecutorService sExecutorService = Executors.newSingleThreadExecutor()
@@ -143,7 +143,7 @@ class Main {
             @Override
             void run() {
                 printlnMsg(apkFile.getName() + "    Decode start  " + Thread.currentThread())
-                AnalyseApk.getInstance().decodeApk.call(apkFile)
+                AnalyseApk.instance.decodeApk.call(apkFile)
             }
         }
         sExecutorService.execute(runnable)

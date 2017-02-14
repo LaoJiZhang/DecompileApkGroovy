@@ -15,27 +15,25 @@ class DecompileApk {
         ApkDecoder decoder = new ApkDecoder()
         File outDir = new File(OUT_FILE_PATH + outName)
         decoder.setOutDir(outDir)
-        if (outDir.exists()) {
-            outDir.deleteDir()
-        }
+        outDir?.deleteDir()
         decoder.setApkFile(file)
         try {
             decoder.decode()
         } catch (IOException ex) {
             println("Could not modify file. Please ensure you have permission.")
-            System.exit(1)
+//            System.exit(1)
         } catch (OutDirExistsException ex) {
             println("Destination directory (" + outDir.getAbsolutePath() + ") already exists. Use -f switch if you want to overwrite it.")
-            System.exit(1)
+//            System.exit(1)
         } catch (InFileNotFoundException ex) {
             println("Input file (" + APK_NAME + ") was not found or was not readable.")
-            System.exit(1)
+//            System.exit(1)
         } catch (CantFindFrameworkResException ex) {
             println("Can't find framework resources for package of id: " + String.valueOf(ex.getPkgId()) + ". You must install proper framework files, see project website for more info.")
-            System.exit(1)
+//            System.exit(1)
         } catch (DirectoryException ex) {
             println("Could not modify internal dex files. Please ensure you have permission.")
-            System.exit(1)
+//            System.exit(1)
         }
         outDir
     }

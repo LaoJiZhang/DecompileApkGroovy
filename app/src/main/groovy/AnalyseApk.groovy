@@ -1,8 +1,8 @@
 import brut.androlib.ApkDecoder
 
+@Singleton(lazy = true, strict = false)
 class AnalyseApk {
 
-    static AnalyseApk INSTANCE = null
     static HashMap<String, Set<String>> sNetworkMap = new HashMap<>()
     static HashMap<String, Set<String>> sImagecLoaderMap = new HashMap<>()
     static HashMap<String, Set<String>> sJsonMap = new HashMap<>()
@@ -26,25 +26,12 @@ class AnalyseApk {
         sDataBase.put("OrmLite", new HashSet<String>())
     }
 
-    static AnalyseApk getInstance() {
-        if (INSTANCE == null) {
-            synchronized (AnalyseApk.class) {
-                if (INSTANCE == null) {
-                    INSTANCE = new AnalyseApk()
-                }
-            }
-        }
-        return INSTANCE
-    }
-
     def decodeApk = { File apk ->
         String outName = apk.getName() + ".out"
         ApkDecoder decoder = new ApkDecoder()
         File outDir = new File(Main.ORIGIN_FILE_PATH + outName)
         decoder.setOutDir(outDir)
-        if (outDir.exists()) {
-            outDir.deleteDir()
-        }
+        outDir?.deleteDir()
         decoder.setApkFile(apk)
         try {
             decoder.decode()
@@ -162,7 +149,11 @@ class AnalyseApk {
     def getPartContent = { String key, Set<String> sets ->
         StringBuilder sb = new StringBuilder()
         sb.append("++++++++++++++++++++ 包含 " + key + " 文件路径 start ++++++++++++++++++++\n")
-        for (String item : sets.sort(false)) {
+//        for (String item : sets.sort(false)) {
+//            sb.append(item)
+//            sb.append("\n")
+//        }
+        for (item in sets.sort(false)) {
             sb.append(item)
             sb.append("\n")
         }
