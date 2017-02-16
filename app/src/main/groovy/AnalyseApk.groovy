@@ -45,6 +45,10 @@ class AnalyseApk {
             Main.printlnMsg(apk.getName() + " decode Apk Success    剩余未反编译数量为：" + Main.successfulCount)
             if (Main.successfulCount == 0) {
                 Main.sExecutorService.shutdown()
+
+                String xmlContent = formatAnalyseInfo2Xml()
+                new File(Main.ORIGIN_FILE_PATH + "analyseInfo.xml").write(xmlContent)
+
                 String content = printlnAnalyseInfo.call()
                 new File(Main.ORIGIN_FILE_PATH + "result.txt").write(content)
             }
@@ -102,6 +106,30 @@ class AnalyseApk {
         } else if (line.toLowerCase().contains("OrmLite".toLowerCase())) {
             sNetworkMap.get("OrmLite").add(childFile.getAbsolutePath())
         }
+    }
+
+    def formatAnalyseInfo2Xml = {
+        def fragment = "<?xml version=\"1.0\" encoding=\"utf-8\"?>"
+        fragment += "<info>"
+        fragment += formatSingleAnalyseInfo2Xml("Network", sNetworkMap)
+        fragment += formatSingleAnalyseInfo2Xml("ImagecLoader", sImagecLoaderMap)
+        fragment += formatSingleAnalyseInfo2Xml("Json", sJsonMap)
+        fragment += formatSingleAnalyseInfo2Xml("DataBase", sDataBase)
+        fragment += "</info>"
+        return fragment
+    }
+
+    def formatSingleAnalyseInfo2Xml = { String root, HashMap map ->
+        def fragment = "<${root}>"
+        map.each { key, value ->
+            fragment += "<key name='${key}'>"
+            value.each {
+                fragment += "<location>${it.toString()}</location>"
+            }
+            fragment += "</key>"
+        }
+        fragment += "</${root}>"
+        return fragment
     }
 
     def printlnAnalyseInfo = {

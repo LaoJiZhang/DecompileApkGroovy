@@ -4,6 +4,7 @@ import rx.Observable
 import rx.functions.Action1
 import rx.functions.Func1
 
+import java.text.SimpleDateFormat
 import java.util.concurrent.ExecutorService
 import java.util.concurrent.Executors
 
@@ -11,8 +12,8 @@ class Main {
 
     static String ORIGIN_FILE_PATH = "apk/"
     static String URL_FORMAT = "http://apis.wandoujia.com/five/v2/apps/tops/weeklytopapp?v=5.17.1&deviceId=ODY2NjU0MDI3MjYwNDAy&sdk=22&id=wandoujia_android&launchedCount=7&udid=9858a9f26eaa4c78bf7160f552f72a9e196b81fd&channel=wandoujia_pc_wandoujia2_homepage&rippleSupported=false&vc=12029&capacity=3&launchedAge=0&start=%d&max=%d"
-    static int START_NUMBER = 60
-    static int END_NUMBER = 4
+    static int START_NUMBER = 50
+    static int END_NUMBER = 5
 
     static int successfulCount = 0
     static ExecutorService sExecutorService = Executors.newSingleThreadExecutor()
@@ -106,34 +107,29 @@ class Main {
         mClient.newCall(request).enqueue(new Callback() {
             @Override
             void onFailure(Call call, IOException e) {
-                String errorMsg = null
                 if (apkFile.exists()) {
                     errorMsg = "delete fail apk:    " + apkFile.getAbsolutePath()
                     apkFile.deleteOnExit()
                 }
-                errorMsg = (errorMsg == null ? "" : errorMsg + "  ") + "download onFailure IOException: " + e.toString()
-                printlnMsg(errorMsg)
+                printlnMsg(errorMsg?.errorMsg + "download onFailure IOException: " + e.toString())
             }
 
             @Override
             void onResponse(Call call, Response response) throws IOException {
-                new Thread(new Runnable() {
-                    @Override
-                    void run() {
-                        try {
-                            printlnMsg("download " + apkName + " : " + Thread.currentThread())
-                            InputStream inputStream = response.body().byteStream()
-                            apkFile.write("")
-                            apkFile.append(inputStream)
-                            inputStream.close()
-                            successfulCount++
-                            printlnMsg("successfulCount = " + successfulCount + "      download Success: " + apkName + "      " + Thread.currentThread())
-                            analyseSingleApk(apkFile)
-                        } catch (Exception e1) {
-                            printlnMsg("download onResponse Exception: " + e1.toString())
-                        }
+                Thread.start {
+                    try {
+                        printlnMsg("download " + apkName + " : " + Thread.currentThread())
+                        InputStream inputStream = response.body().byteStream()
+                        apkFile.write("")
+                        apkFile.append(inputStream)
+                        inputStream.close()
+                        successfulCount++
+                        printlnMsg("successfulCount = " + successfulCount + "      download Success: " + apkName + "      " + Thread.currentThread())
+                        analyseSingleApk(apkFile)
+                    } catch (Exception e1) {
+                        printlnMsg("download onResponse Exception: " + e1.toString())
                     }
-                }).start()
+                }
             }
         })
     }
@@ -142,7 +138,7 @@ class Main {
         Runnable runnable = new Runnable() {
             @Override
             void run() {
-                printlnMsg(apkFile.getName() + "    Decode start  " + Thread.currentThread())
+                printlnMsg("apkName:" + apkFile.getName() + "       Decode startThread:" + Thread.currentThread() + "       startTime:" + new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(System.currentTimeMillis()))
                 AnalyseApk.instance.decodeApk.call(apkFile)
             }
         }
